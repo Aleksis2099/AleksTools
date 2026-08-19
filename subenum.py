@@ -15,11 +15,16 @@ dom = args.dominio
 wl = args.wordlist
 max_threads = args.threads
 
+# --- Archivos de salida ---
+results_file = f"results_{dom}.txt"
+subdomains_file = f"subdomains_{dom}.txt"
+
 # --- Bienvenida ---
 print("Bienvenido al enumerador de subdominios de AleksLabs.dev")
 print(f"[*] Target:   {dom}")
 print(f"[*] Wordlist: {wl}")
 print(f"[*] Threads:  {max_threads}")
+print(f"[*] Output:   {results_file} + {subdomains_file}")
 print(" ")
 
 # --- Validar dominio ---
@@ -40,6 +45,9 @@ encontrados = 0
 probados = 0
 lock = threading.Lock()
 
+# --- Abrir archivo de subdominios (se cierra al final) ---
+sub_file = open(subdomains_file, "w")
+
 # --- Función que corre cada thread ---
 def probar_subdominio(subd):
     global encontrados, probados
@@ -49,6 +57,7 @@ def probar_subdominio(subd):
             encontrados += 1
             probados += 1
             print(f"[+] {subd} ENCONTRADO → {ip}")
+            sub_file.write(subd + "\n")   # <<< Guarda el subdominio en archivo
     except socket.gaierror:
         with lock:
             probados += 1
@@ -66,7 +75,7 @@ def worker(subd):
 with open(wl, "r") as f:
     for linea in f:
         palabra = linea.strip()
-        # ✅ Fix UnicodeError — aquí es donde va la validación
+        # Fix UnicodeError
         if not palabra or len(palabra) > 63:
             continue
         subd = palabra + "." + dom
@@ -78,8 +87,30 @@ with open(wl, "r") as f:
 for t in threads:
     t.join()
 
-# --- Resumen ---
+# --- Cerrar archivo de subdominios ---
+sub_file.close()
+
+# --- Escribir resumen en results_file ---
+with open(results_file, "w") as f:
+    f.write("=" * 70 + "\n")
+    f.write(f"  SUBDOMAIN ENUMERATION REPORT - {dom}\n")
+    f.write(f"  Fecha: {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+    f.write("=" * 70 + "\n\n")
+    f.write(f"  Wordlist usada: {wl}\n")
+    f.write(f"  Threads:        {max_threads}\n\n")
+    f.write(f"  TOTAL PROBADOS:   {probados}\n")
+    f.write(f"  TOTAL ENCONTRADOS: {encontrados}\n\n")
+    f.write("  Subdominios encontrados:\n")
+    f.write("-" * 70 + "\n")
+    # Leer de vuelta los subdominios guardados
+    with open(subdomains_file, "r") as sub_f:
+        for linea in sub_f:
+            f.write("  " + linea.strip() + "\n")
+
+# --- Resumen en pantalla ---
 print("\n" + "=" * 70)
 print(f"  Se encontraron {encontrados} subdominios de {probados} probados.")
+print(f"  Subdominios guardados en: {subdomains_file}")
+print(f"  Reporte guardado en:      {results_file}")
 print("  Gracias por usar el escaneador de subdominios de AleksLabs")
 print("=" * 70)
