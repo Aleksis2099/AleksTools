@@ -2,6 +2,8 @@
 
 Herramientas de **reconocimiento y pentesting** desarrolladas en Python y Bash por **Alexis (Aleksis2099)**, estudiante de ciberseguridad y cazador de bug bounty.
 
+> Estas herramientas fueron escritas a mano, línea por línea, probadas y depuradas en el laboratorio.
+
 ## 📋 Contenido
 
 | Herramienta | Lenguaje | Descripción |
