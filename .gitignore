@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+
+# Resultados de escaneo (aleks tools) — no subir datos de targets
+alive_*.txt
+subdomains_*.txt
+results_*.txt
+dns_resolver.txt
+port_scanner.txt
+http_header_scanner.txt
+subenum.txt
+subdomains_solo.txt
+# Carpetas de resultados por target
+/*/alive_*.txt
+/*/subdomains_*.txt
+/*/results_*.txt
+
+# Logs / temporales
+*.log
+*.tmp
